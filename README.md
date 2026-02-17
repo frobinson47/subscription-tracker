@@ -2,7 +2,7 @@
 
 A local-first subscription management app that puts all your recurring charges in one place. No bank linking, no permissions — just add your subscriptions manually and stay on top of what you're paying for.
 
-![Dashboard](dashboard-screenshot.png)
+![Dashboard](screenshots/dashboard.png)
 
 ## Features
 
@@ -15,6 +15,16 @@ A local-first subscription management app that puts all your recurring charges i
 - **Security** — Optional PIN to encrypt sensitive notes (AES-GCM via Web Crypto API)
 - **Data Portability** — Full JSON backup/restore and CSV export/import
 - **Theming** — Light, dark, and system themes
+
+### Screenshots
+
+| Subscriptions | Calendar |
+|:---:|:---:|
+| ![Subscriptions](screenshots/subscriptions.png) | ![Calendar](screenshots/calendar.png) |
+
+| Household | Insights |
+|:---:|:---:|
+| ![Household](screenshots/household.png) | ![Insights](screenshots/insights.png) |
 
 ## Tech Stack
 
@@ -41,7 +51,7 @@ npm run build
 npm start
 ```
 
-Open [http://localhost:3001](http://localhost:3001) in your browser.
+Open [http://localhost:3001](http://localhost:3001) in your browser. Go to **Settings > Load Demo Data** to populate sample subscriptions.
 
 ## Project Structure
 

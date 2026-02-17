@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Download, Upload, Trash2, Shield } from 'lucide-react';
+import { Download, Upload, Trash2, Shield, Database } from 'lucide-react';
 import { toast } from 'sonner';
 import { useSettings } from '@/hooks/use-settings';
 import { useTheme } from 'next-themes';
@@ -19,6 +19,7 @@ import { exportJSON, importJSON, exportCSV, importCSV, downloadFile } from '@/li
 import { createPinVerification, verifyPin } from '@/lib/encryption';
 import { useStore } from '@/lib/store';
 import { db } from '@/lib/db';
+import { loadDemoData } from '@/lib/demo-data';
 import type { AlertTiming } from '@/types';
 
 export default function SettingsPage() {
@@ -277,6 +278,27 @@ export default function SettingsPage() {
                 JSON import replaces all existing data. CSV import adds to existing subscriptions.
               </p>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Demo Data */}
+        <Card>
+          <CardHeader><CardTitle className="text-sm">Demo Data</CardTitle></CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground mb-3">
+              Load sample subscriptions and household members to explore the app.
+              This replaces existing subscriptions and members.
+            </p>
+            <Button
+              variant="outline"
+              onClick={async () => {
+                const result = await loadDemoData();
+                toast.success(`Loaded ${result.subscriptions} subscriptions and ${result.members} members`);
+              }}
+            >
+              <Database className="h-4 w-4 mr-2" />
+              Load Demo Data
+            </Button>
           </CardContent>
         </Card>
 

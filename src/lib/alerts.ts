@@ -25,29 +25,32 @@ export function generateAlerts(
       timings.add(30);
     }
 
-    for (const daysBefore of timings) {
-      // Alert should fire when we're within the window
-      if (daysUntil <= daysBefore && daysUntil >= 0) {
-        const alertDate = format(addDays(renewalDate, -daysBefore), 'yyyy-MM-dd');
+    // Check snooze
+    if (sub.alertSnoozedUntil && todayStr < sub.alertSnoozedUntil) {
+      continue;
+    }
 
-        // Check snooze
-        if (sub.alertSnoozedUntil && todayStr < sub.alertSnoozedUntil) {
-          continue;
-        }
+    // Find the earliest (most urgent) threshold that's been crossed
+    const matchedTimings = Array.from(timings)
+      .filter((daysBefore) => daysUntil <= daysBefore && daysUntil >= 0)
+      .sort((a, b) => a - b);
 
-        alerts.push({
-          id: `${sub.id}-${sub.nextRenewalDate}-${daysBefore}`,
-          subscriptionId: sub.id,
-          subscriptionName: sub.name,
-          renewalDate: sub.nextRenewalDate,
-          amount: sub.amount + (sub.taxAmount ?? 0),
-          effectiveMonthly,
-          daysBefore,
-          alertDate,
-          dismissed: false,
-          snoozedUntil: undefined,
-        });
-      }
+    if (matchedTimings.length > 0) {
+      const daysBefore = matchedTimings[0]; // most urgent
+      const alertDate = format(addDays(renewalDate, -daysBefore), 'yyyy-MM-dd');
+
+      alerts.push({
+        id: `${sub.id}-${sub.nextRenewalDate}-${daysBefore}`,
+        subscriptionId: sub.id,
+        subscriptionName: sub.name,
+        renewalDate: sub.nextRenewalDate,
+        amount: sub.amount + (sub.taxAmount ?? 0),
+        effectiveMonthly,
+        daysBefore,
+        alertDate,
+        dismissed: false,
+        snoozedUntil: undefined,
+      });
     }
   }
 
@@ -60,8 +63,9 @@ export function generateAlerts(
 }
 
 export function getAlertUrgencyColor(daysUntil: number): string {
-  if (daysUntil <= 1) return 'text-red-600 bg-red-50 border-red-200 dark:bg-red-950 dark:border-red-800';
-  if (daysUntil <= 3) return 'text-orange-600 bg-orange-50 border-orange-200 dark:bg-orange-950 dark:border-orange-800';
-  if (daysUntil <= 7) return 'text-yellow-600 bg-yellow-50 border-yellow-200 dark:bg-yellow-950 dark:border-yellow-800';
-  return 'text-blue-600 bg-blue-50 border-blue-200 dark:bg-blue-950 dark:border-blue-800';
+  if (daysUntil <= 1) return 'text-white bg-red-50 border-red-200 dark:bg-red-950 dark:border-red-800';
+  if (daysUntil <= 3) return 'text-white bg-yellow-50 border-yellow-200 dark:bg-yellow-950 dark:border-yellow-800';
+  if (daysUntil <= 7) return 'text-white bg-blue-50 border-blue-200 dark:bg-blue-950 dark:border-blue-800';
+  if (daysUntil <= 14) return 'text-white bg-violet-50 border-violet-200 dark:bg-violet-950 dark:border-violet-800';
+  return 'text-white bg-teal-50 border-teal-200 dark:bg-teal-950 dark:border-teal-800';
 }
