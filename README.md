@@ -2,6 +2,8 @@
 
 A local-first subscription management app that puts all your recurring charges in one place. No bank linking, no permissions — just add your subscriptions manually and stay on top of what you're paying for.
 
+![Dashboard](dashboard-screenshot.png)
+
 ## Features
 
 - **Dashboard** — Monthly/yearly totals, category breakdown chart, upcoming renewals, and renewal alerts
