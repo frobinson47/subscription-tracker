@@ -43,5 +43,8 @@ next-env.d.ts
 # bat scripts
 *.bat
 
+# scripts
+scripts/
+
 # claude code
 .claude/
