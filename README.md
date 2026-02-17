@@ -1,36 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Subscription Tracker
+
+A local-first subscription management app that puts all your recurring charges in one place. No bank linking, no permissions — just add your subscriptions manually and stay on top of what you're paying for.
+
+## Features
+
+- **Dashboard** — Monthly/yearly totals, category breakdown chart, upcoming renewals, and renewal alerts
+- **Subscription Management** — Full CRUD with logo uploads, billing cycles (weekly through custom), intro/trial pricing, add-ons, price history tracking, and value assessments
+- **Renewal Calendar** — Month grid with category-colored dots, gridlines, day detail view, and big-hit month warnings when spending spikes
+- **Household** — Track family members with avatar uploads, see per-person costs, assign payer/owner/user roles to each subscription
+- **Insights** — Waste detector (low-value + high-cost subs), duplicate detection via Levenshtein distance, category overlap analysis, price increase tracking
+- **Alerts** — Configurable timing (1/3/7/14/30 days before renewal), escalation for expensive subscriptions, snooze and dismiss
+- **Security** — Optional PIN to encrypt sensitive notes (AES-GCM via Web Crypto API)
+- **Data Portability** — Full JSON backup/restore and CSV export/import
+- **Theming** — Light, dark, and system themes
+
+## Tech Stack
+
+- **Framework:** Next.js 15 (App Router, Turbopack)
+- **Language:** TypeScript (strict mode)
+- **Styling:** Tailwind CSS v4 + shadcn/ui
+- **Storage:** Dexie.js (IndexedDB) — all data stays in your browser
+- **State:** Zustand (UI state), React Hook Form + Zod (forms)
+- **Charts:** Recharts
+- **Date Math:** date-fns
+- **Encryption:** Web Crypto API (PBKDF2 + AES-GCM)
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+# Install dependencies
+npm install
+
+# Run dev server (port 3001, Turbopack)
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Production build
+npm run build
+npm start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3001](http://localhost:3001) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+src/
+├── app/                    # Next.js pages
+│   ├── dashboard/          # Main dashboard
+│   ├── subscriptions/      # List, add, edit, detail views
+│   ├── calendar/           # Renewal calendar
+│   ├── household/          # Family member management
+│   ├── insights/           # Waste detection & analytics
+│   └── settings/           # Preferences, security, data management
+├── components/
+│   ├── dashboard/          # Dashboard widgets
+│   ├── layout/             # Sidebar, mobile nav, header
+│   ├── subscription/       # Card, detail, form components
+│   └── ui/                 # shadcn/ui primitives
+├── hooks/                  # Custom React hooks (CRUD, alerts, cashflow)
+├── lib/                    # Business logic
+│   ├── calculations.ts     # Cost normalization & formatting
+│   ├── renewal-engine.ts   # Billing cycle math & cashflow projection
+│   ├── alerts.ts           # Alert generation & escalation
+│   ├── encryption.ts       # PIN-based note encryption
+│   ├── db.ts               # Dexie database schema
+│   └── export-import.ts    # JSON/CSV data portability
+└── types/                  # TypeScript interfaces
+```
 
-## Learn More
+## Privacy
 
-To learn more about Next.js, take a look at the following resources:
+All data is stored locally in your browser's IndexedDB. Nothing is sent to any server. Sensitive notes can be encrypted with a PIN that never leaves your device.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## License
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT
