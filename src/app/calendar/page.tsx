@@ -16,10 +16,15 @@ import { getCashflowEntries, getMonthTotal } from '@/lib/renewal-engine';
 import { formatCurrency } from '@/lib/calculations';
 import { formatDateShort } from '@/lib/utils';
 import { CATEGORY_FALLBACK_COLOR } from '@/lib/constants';
+import { useRouter } from 'next/navigation';
+import { MotionPage } from '@/components/ui/motion-page';
+import { EmptyState } from '@/components/ui/empty-state';
+import { CalendarGridIllustration } from '@/components/ui/illustrations';
 
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 export default function CalendarPage() {
+  const router = useRouter();
   const { subscriptions } = useSubscriptions();
   const { categories } = useCategories();
   const { settings } = useSettings();
@@ -78,9 +83,17 @@ export default function CalendarPage() {
     : [];
 
   return (
-    <>
+    <MotionPage>
       <Header title="Calendar" />
 
+      {subscriptions.length === 0 ? (
+        <EmptyState
+          illustration={<CalendarGridIllustration />}
+          title="No renewals to show"
+          description="Add subscriptions to see your upcoming renewal dates on the calendar."
+          primaryAction={{ label: 'Add Subscription', onClick: () => router.push('/subscriptions/new') }}
+        />
+      ) : (
       <div className="grid grid-cols-1 lg:grid-cols-[2fr_1.1fr] gap-6">
         {/* Calendar Grid */}
         <div>
@@ -207,6 +220,7 @@ export default function CalendarPage() {
           </Card>
         </div>
       </div>
-    </>
+      )}
+    </MotionPage>
   );
 }

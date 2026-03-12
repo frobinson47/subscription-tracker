@@ -134,6 +134,13 @@ export interface AppSettings {
   lastBackupDate?: string;
 }
 
+// ============ PERSISTENCE ============
+
+export interface UserPreference {
+  key: string;
+  value: unknown;
+}
+
 // ============ COMPUTED / UI TYPES ============
 
 export interface Alert {

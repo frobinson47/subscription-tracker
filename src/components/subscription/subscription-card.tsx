@@ -1,31 +1,35 @@
 'use client';
 
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import type { Subscription, Category } from '@/types';
 import { getCurrentEffectiveMonthly, formatEffectiveCost, formatCurrency } from '@/lib/calculations';
 import { formatDateShort, daysUntil } from '@/lib/utils';
 import { STATUS_COLORS, CATEGORY_FALLBACK_COLOR } from '@/lib/constants';
+import { BrandLogo } from '@/components/subscription/brand-logo';
 
 interface SubscriptionCardProps {
   subscription: Subscription;
   category?: Category;
+  disableLink?: boolean;
 }
 
-export function SubscriptionCard({ subscription: sub, category }: SubscriptionCardProps) {
+export function SubscriptionCard({ subscription: sub, category, disableLink }: SubscriptionCardProps) {
   const days = daysUntil(sub.nextRenewalDate);
   const effectiveMonthly = getCurrentEffectiveMonthly(sub);
 
-  return (
-    <Link href={`/subscriptions/${sub.id}`}>
-      <Card className="hover:shadow-md transition-shadow cursor-pointer">
+  const cardContent = (
+    <motion.div
+      whileHover={{ y: -2, boxShadow: '0 8px 24px rgba(68,46,20,0.10)' }}
+      transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+    >
+      <Card className="cursor-pointer">
         <CardContent className="pt-4 pb-4">
           <div className="flex items-start justify-between gap-2">
             <div className="flex items-center gap-3 flex-1 min-w-0">
-              {sub.logoUrl && (
-                <img src={sub.logoUrl} alt="" className="w-8 h-8 rounded-md object-contain shrink-0" />
-              )}
+              <BrandLogo name={sub.name} logoUrl={sub.logoUrl} size={32} className="shrink-0" />
               <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
                 <h3 className="font-semibold text-sm truncate">{sub.name}</h3>
@@ -68,6 +72,9 @@ export function SubscriptionCard({ subscription: sub, category }: SubscriptionCa
           </div>
         </CardContent>
       </Card>
-    </Link>
+    </motion.div>
   );
+
+  if (disableLink) return cardContent;
+  return <Link href={`/subscriptions/${sub.id}`}>{cardContent}</Link>;
 }

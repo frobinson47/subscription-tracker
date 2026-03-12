@@ -1,6 +1,7 @@
 'use client';
 
 import { Card, CardContent } from '@/components/ui/card';
+import { AnimatedNumber } from '@/components/ui/animated-number';
 import { CreditCard, Clock, AlertTriangle, Tag } from 'lucide-react';
 
 interface QuickStatsProps {
@@ -27,7 +28,7 @@ export function QuickStats({ activeSubs, trialsEndingSoon, upcomingThisWeek, cat
               <stat.icon className={`h-4 w-4 ${stat.color}`} />
               <span className="text-sm text-muted-foreground">{stat.label}</span>
             </div>
-            <div className="text-2xl font-bold mt-1">{stat.value}</div>
+            <div className="text-2xl font-bold mt-1"><AnimatedNumber value={stat.value} duration={0.6} /></div>
           </CardContent>
         </Card>
       ))}

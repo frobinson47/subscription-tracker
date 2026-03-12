@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Header } from '@/components/layout/header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Download, Upload, Trash2, Shield, Database } from 'lucide-react';
+import { Download, Upload, Trash2, Shield, Database, HardDrive } from 'lucide-react';
 import { toast } from 'sonner';
 import { useSettings } from '@/hooks/use-settings';
 import { useTheme } from 'next-themes';
@@ -20,7 +20,15 @@ import { createPinVerification, verifyPin } from '@/lib/encryption';
 import { useStore } from '@/lib/store';
 import { db } from '@/lib/db';
 import { loadDemoData } from '@/lib/demo-data';
+import {
+  isFileSystemAccessSupported,
+  checkBackupStatus,
+  pickBackupDirectory,
+  writeBackup,
+  clearDirectoryHandle,
+} from '@/lib/auto-backup';
 import type { AlertTiming } from '@/types';
+import { MotionPage } from '@/components/ui/motion-page';
 
 export default function SettingsPage() {
   const { settings, updateSettings } = useSettings();
@@ -29,6 +37,52 @@ export default function SettingsPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [importType, setImportType] = useState<'json' | 'csv'>('json');
   const [pinInput, setPinInput] = useState('');
+  const [backupSupported] = useState(() => isFileSystemAccessSupported());
+  const [backupStatus, setBackupStatus] = useState<{ configured: boolean; hasPermission: boolean; dirName: string | null }>({ configured: false, hasPermission: false, dirName: null });
+  const [backupLoading, setBackupLoading] = useState(false);
+
+  useEffect(() => {
+    if (backupSupported) {
+      checkBackupStatus().then(setBackupStatus);
+    }
+  }, [backupSupported]);
+
+  const handlePickBackupDir = async () => {
+    try {
+      const handle = await pickBackupDirectory();
+      setBackupStatus({ configured: true, hasPermission: true, dirName: handle.name });
+      toast.success(`Backup folder set to "${handle.name}"`);
+    } catch {
+      // User cancelled the picker
+    }
+  };
+
+  const handleBackupNow = async () => {
+    setBackupLoading(true);
+    try {
+      const json = await exportJSON();
+      const success = await writeBackup(json);
+      if (success) {
+        const now = new Date().toISOString();
+        await updateSettings({ lastBackupDate: now });
+        toast.success('Backup saved successfully');
+      } else {
+        toast.error('Backup failed. You may need to re-select the folder.');
+        const status = await checkBackupStatus();
+        setBackupStatus(status);
+      }
+    } catch {
+      toast.error('Backup failed');
+    } finally {
+      setBackupLoading(false);
+    }
+  };
+
+  const handleRemoveBackupDir = async () => {
+    await clearDirectoryHandle();
+    setBackupStatus({ configured: false, hasPermission: false, dirName: null });
+    toast.success('Backup folder removed');
+  };
 
   const handleExportJSON = async () => {
     const json = await exportJSON();
@@ -115,7 +169,7 @@ export default function SettingsPage() {
   const hasPin = !!settings.pinVerifyHash;
 
   return (
-    <>
+    <MotionPage>
       <Header title="Settings" />
 
       <div className="space-y-6 max-w-2xl">
@@ -281,6 +335,63 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
+        {/* Auto-Backup */}
+        {backupSupported && (
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <HardDrive className="h-4 w-4" />
+                <CardTitle className="text-sm">Auto-Backup</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Automatically back up to a local folder. Works with Dropbox, iCloud, Google Drive, OneDrive.
+              </p>
+
+              {backupStatus.configured ? (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Badge variant={backupStatus.hasPermission ? 'default' : 'secondary'}>
+                      {backupStatus.hasPermission ? 'Configured' : 'Permission needed'}
+                    </Badge>
+                    <span className="text-sm text-muted-foreground">
+                      {backupStatus.dirName}
+                    </span>
+                  </div>
+                  {settings.lastBackupDate && (
+                    <p className="text-sm text-muted-foreground">
+                      Last backup: {new Date(settings.lastBackupDate).toLocaleString()}
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">Not configured</p>
+              )}
+
+              <div className="flex flex-wrap gap-2">
+                <Button variant="outline" onClick={handlePickBackupDir}>
+                  Choose Folder
+                </Button>
+                {backupStatus.configured && (
+                  <>
+                    <Button variant="outline" onClick={handleBackupNow} disabled={backupLoading}>
+                      {backupLoading ? 'Backing up...' : 'Backup Now'}
+                    </Button>
+                    <Button variant="outline" onClick={handleRemoveBackupDir}>
+                      Remove
+                    </Button>
+                  </>
+                )}
+              </div>
+
+              <p className="text-xs text-muted-foreground">
+                Chromium browsers only (Chrome, Edge, Opera)
+              </p>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Demo Data */}
         <Card>
           <CardHeader><CardTitle className="text-sm">Demo Data</CardTitle></CardHeader>
@@ -334,6 +445,6 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
       </div>
-    </>
+    </MotionPage>
   );
 }

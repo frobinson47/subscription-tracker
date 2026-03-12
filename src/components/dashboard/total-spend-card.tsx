@@ -1,6 +1,8 @@
 'use client';
 
+import { useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { AnimatedNumber } from '@/components/ui/animated-number';
 import { formatCurrency } from '@/lib/calculations';
 
 interface TotalSpendCardProps {
@@ -10,6 +12,8 @@ interface TotalSpendCardProps {
 }
 
 export function TotalSpendCard({ monthlyTotal, yearlyTotal, currency = 'USD' }: TotalSpendCardProps) {
+  const fmt = useCallback((n: number) => formatCurrency(n, currency), [currency]);
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <Card>
@@ -17,7 +21,7 @@ export function TotalSpendCard({ monthlyTotal, yearlyTotal, currency = 'USD' }: 
           <CardTitle className="text-sm font-medium text-muted-foreground">Monthly Spend</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-3xl font-bold">{formatCurrency(monthlyTotal, currency)}</div>
+          <div className="text-3xl font-bold"><AnimatedNumber value={monthlyTotal} formatFn={fmt} /></div>
           <p className="text-xs text-muted-foreground mt-1">per month, all active subscriptions</p>
         </CardContent>
       </Card>
@@ -26,7 +30,7 @@ export function TotalSpendCard({ monthlyTotal, yearlyTotal, currency = 'USD' }: 
           <CardTitle className="text-sm font-medium text-muted-foreground">Yearly Spend</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-3xl font-bold">{formatCurrency(yearlyTotal, currency)}</div>
+          <div className="text-3xl font-bold"><AnimatedNumber value={yearlyTotal} formatFn={fmt} /></div>
           <p className="text-xs text-muted-foreground mt-1">projected annual cost</p>
         </CardContent>
       </Card>

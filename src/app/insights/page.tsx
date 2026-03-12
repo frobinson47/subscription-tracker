@@ -11,8 +11,13 @@ import { useSettings } from '@/hooks/use-settings';
 import { getCurrentEffectiveMonthly, formatCurrency } from '@/lib/calculations';
 import { findDuplicates, findSimilarSubscriptions } from '@/lib/duplicate-detection';
 import { USAGE_LABELS } from '@/lib/constants';
+import { useRouter } from 'next/navigation';
+import { MotionPage } from '@/components/ui/motion-page';
+import { EmptyState } from '@/components/ui/empty-state';
+import { MagnifyingGlassIllustration } from '@/components/ui/illustrations';
 
 export default function InsightsPage() {
+  const router = useRouter();
   const { subscriptions } = useSubscriptions();
   const { categories } = useCategories();
   const { settings } = useSettings();
@@ -59,9 +64,17 @@ export default function InsightsPage() {
   const wasteTotal = wasteSubs.reduce((sum, s) => sum + getCurrentEffectiveMonthly(s), 0);
 
   return (
-    <>
+    <MotionPage>
       <Header title="Insights" description="Find waste and optimize your spending" />
 
+      {subscriptions.length === 0 ? (
+        <EmptyState
+          illustration={<MagnifyingGlassIllustration />}
+          title="No insights yet"
+          description="Add subscriptions to get spending insights, waste detection, and optimization tips."
+          primaryAction={{ label: 'Add Subscription', onClick: () => router.push('/subscriptions/new') }}
+        />
+      ) : (
       <div className="space-y-6">
         {/* Waste Detector */}
         <Card>
@@ -209,6 +222,7 @@ export default function InsightsPage() {
           </Card>
         </div>
       </div>
-    </>
+      )}
+    </MotionPage>
   );
 }

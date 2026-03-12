@@ -16,6 +16,9 @@ import { useSettings } from '@/hooks/use-settings';
 import { getCurrentEffectiveMonthly, formatCurrency } from '@/lib/calculations';
 import { AVATAR_COLORS } from '@/lib/constants';
 import type { HouseholdRole } from '@/types';
+import { MotionPage } from '@/components/ui/motion-page';
+import { EmptyState } from '@/components/ui/empty-state';
+import { PeopleSilhouettesIllustration } from '@/components/ui/illustrations';
 
 export default function HouseholdPage() {
   const { members, addMember, updateMember, deleteMember } = useHousehold();
@@ -92,7 +95,7 @@ export default function HouseholdPage() {
   const selectedMemberSubs = selectedMemberId ? getMemberSubs(selectedMemberId) : [];
 
   return (
-    <>
+    <MotionPage>
       <Header title="Household" description={`${members.length} member${members.length !== 1 ? 's' : ''}`} />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -162,9 +165,12 @@ export default function HouseholdPage() {
           </Dialog>
 
           {members.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground text-sm">
-              Add household members to track who uses what
-            </div>
+            <EmptyState
+              illustration={<PeopleSilhouettesIllustration />}
+              title="No household members"
+              description="Add members to track who uses and pays for each subscription."
+              primaryAction={{ label: 'Add Member', onClick: () => setDialogOpen(true) }}
+            />
           ) : (
             <div className="space-y-2">
               {members.map((member) => {
@@ -299,6 +305,6 @@ export default function HouseholdPage() {
           )}
         </div>
       </div>
-    </>
+    </MotionPage>
   );
 }

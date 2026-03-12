@@ -1,5 +1,5 @@
 import Dexie, { type EntityTable } from 'dexie';
-import type { Subscription, HouseholdMember, Category, AppSettings, AlertRecord } from '@/types';
+import type { Subscription, HouseholdMember, Category, AppSettings, AlertRecord, UserPreference } from '@/types';
 
 class SubTrackerDB extends Dexie {
   subscriptions!: EntityTable<Subscription, 'id'>;
@@ -7,6 +7,7 @@ class SubTrackerDB extends Dexie {
   categories!: EntityTable<Category, 'id'>;
   settings!: EntityTable<AppSettings, 'id'>;
   alertRecords!: EntityTable<AlertRecord, 'id'>;
+  userPreferences!: EntityTable<UserPreference, 'key'>;
 
   constructor() {
     super('SubTrackerDB');
@@ -35,6 +36,16 @@ class SubTrackerDB extends Dexie {
           cat.color = match?.color ?? '#9CA3AF';
         }
       });
+    });
+
+    // v3: add userPreferences table
+    this.version(3).stores({
+      subscriptions: 'id, name, categoryId, status, nextRenewalDate, payerId, ownerId',
+      householdMembers: 'id, name',
+      categories: 'id, name, sortOrder',
+      settings: 'id',
+      alertRecords: 'id, subscriptionId, renewalDate',
+      userPreferences: 'key',
     });
   }
 }
