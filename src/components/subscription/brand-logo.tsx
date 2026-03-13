@@ -64,7 +64,25 @@ export function BrandLogo({ name, logoUrl, size = 32, className = '' }: BrandLog
     );
   }
 
-  // 2. Known brand — show SVG icon from CDN with brand-colored background
+  // 2. Known brand with inline SVG path — no network request needed
+  if (brand?.svgPath) {
+    return (
+      <div
+        className={`rounded-md flex items-center justify-center select-none ${className}`}
+        style={{
+          ...sizeStyle,
+          backgroundColor: `#${brand.color}`,
+        }}
+        aria-label={name}
+      >
+        <svg width={iconSize} height={iconSize} viewBox="0 0 24 24" fill="white">
+          <path d={brand.svgPath} />
+        </svg>
+      </div>
+    );
+  }
+
+  // 3. Known brand — fetch SVG icon from CDN
   if (brand && !imgFailed) {
     const isVeryDark = parseInt(brand.color, 16) < 0x333333;
     const iconFilter = isVeryDark
