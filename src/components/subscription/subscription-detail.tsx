@@ -11,6 +11,7 @@ import { getCurrentEffectiveMonthly, getEffectiveYearly, formatCurrency, formatE
 import { formatDate, daysUntil } from '@/lib/utils';
 import { STATUS_COLORS, BILLING_CYCLE_LABELS, USAGE_LABELS } from '@/lib/constants';
 import { db } from '@/lib/db';
+import { BrandLogo } from '@/components/subscription/brand-logo';
 
 interface SubscriptionDetailProps {
   subscription: Subscription;
@@ -39,9 +40,7 @@ export function SubscriptionDetail({ subscription: sub, category, members }: Sub
       <div className="flex items-start justify-between">
         <div>
           <div className="flex items-center gap-3">
-            {sub.logoUrl && (
-              <img src={sub.logoUrl} alt="" className="w-10 h-10 rounded-lg object-contain shrink-0" />
-            )}
+            <BrandLogo name={sub.name} logoUrl={sub.logoUrl} size={40} className="shrink-0" />
             <h1 className="text-2xl font-bold">{sub.name}</h1>
             <Badge className={STATUS_COLORS[sub.status]}>{sub.status}</Badge>
           </div>

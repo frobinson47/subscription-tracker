@@ -48,3 +48,6 @@ scripts/
 
 # claude code
 .claude/
+
+# AgentOps session artifacts (auto-added)
+.agents/

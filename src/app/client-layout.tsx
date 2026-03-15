@@ -6,6 +6,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { Sidebar } from '@/components/layout/sidebar';
 import { MobileNav } from '@/components/layout/mobile-nav';
 import { DBProvider } from '@/components/layout/db-provider';
+import { CommandPalette } from '@/components/layout/command-palette';
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -21,6 +22,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
             </main>
             <MobileNav />
           </div>
+          <CommandPalette />
           <Toaster />
         </DBProvider>
       </TooltipProvider>
